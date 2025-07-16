@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loopit - Plateforme de Location d'Objets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 10px 15px;
+            border-radius: 25px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 25px;
+            padding: 8px 20px;
+            margin: 0 20px;
+            width: 400px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            flex: 1;
+            padding: 5px;
+            font-size: 1rem;
+        }
+
+        .search-bar button {
+            background: #4facfe;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: white;
+            color: #4facfe;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Page Navigation */
+        .page-nav {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .page-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-tab {
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .page-tab.active {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .page-tab:hover {
+            background: #e9ecef;
+        }
+
+        .page-tab.active:hover {
+            background: #4facfe;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Home Page */
+        .hero-section {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .popular-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .item-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .item-details {
+            padding: 20px;
+        }
+
+        .item-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .item-price {
+            color: #4facfe;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .item-location {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Object Details Page */
+        .object-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .object-gallery {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: #666;
+        }
+
+        .object-info {
+            padding: 20px;
+        }
+
+        .object-title {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .object-price {
+            font-size: 1.5rem;
+            color: #4facfe;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .object-description {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .object-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .meta-item {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-weight: bold;
+        }
+
+        .reserve-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        /* Listing Form */
+        .listing-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .photo-upload {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .photo-upload:hover {
+            border-color: #4facfe;
+            background: #f8f9fa;
+        }
+
+        .photo-upload-icon {
+            font-size: 3rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            height: 600px;
+        }
+
+        .chat-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: #f8f9fa;
+        }
+
+        .chat-item.active {
+            background: #e3f2fd;
+        }
+
+        .chat-main {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            max-width: 70%;
+        }
+
+        .message.sent {
+            background: #4facfe;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            background: #4facfe;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .rental-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .notification {
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #4facfe;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            background: #333;
+            color: white;
+            padding: 40px 30px 20px;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 15px;
+            color: #4facfe;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer-section ul li a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section ul li a:hover {
+            color: #4facfe;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #555;
+            color: #ccc;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-bar {
+                width: 100%;
+                margin: 0;
+            }
+
+            .object-details {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .chat-sidebar {
+                order: 2;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">🔄 Loopit</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item">Rechercher un objet</a>
+                <a href="#" class="nav-item">Proposer un objet</a>
+                <a href="#" class="nav-item">Catégories</a>
+                <a href="#" class="nav-item">Aide</a>
+            </nav>
+            <div class="search-bar">
+                <input type="text" placeholder="Rechercher un objet...">
+                <button>🔍</button>
+            </div>
+            <div class="auth-buttons">
+                <a href="#" class="btn btn-secondary">Connexion</a>
+                <a href="#" class="btn btn-primary">S'inscrire</a>
+            </div>
+        </header>
+
+        <!-- Page Navigation -->
+        <div class="page-nav">
+            <div class="page-tabs">
+                <div class="page-tab active" onclick="showPage('home')">Page d'accueil</div>
+                <div class="page-tab" onclick="showPage('object-details')">Fiche d'objet</div>
+                <div class="page-tab" onclick="showPage('listing')">Dépôt d'objet</div>
+                <div class="page-tab" onclick="showPage('chat')">Messagerie</div>
+                <div class="page-tab" onclick="showPage('dashboard')">Tableau de bord</div>
+                <div class="page-tab" onclick="showPage('components')">Composants</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page d'accueil -->
+            <div id="home" class="page active">
+                <div class="hero-section">
+                    <h1 class="hero-title">Louez tout ce dont vous avez besoin</h1>
+                    <p class="hero-subtitle">Découvrez des milliers d'objets disponibles près de chez vous</p>
+                    <div class="cta-buttons">
+                        <a href="#" class="btn btn-primary">Rechercher un objet</a>
+                        <a href="#" class="btn btn-secondary">Proposer un objet</a>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 30px; text-align: center;">Catégories populaires</h2>
+                <div class="categories-grid">
+                    <div class="category-card">
+                        <div class="category-icon">📱</div>
+                        <h3>Appareils numériques</h3>
+                        <p>Smartphones, tablettes, ordinateurs portables</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🔧</div>
+                        <h3>Outillage</h3>
+                        <p>Perceuses, scies, outils de jardinage</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🏠</div>
+                        <h3>Maison & Jardin</h3>
+                        <p>Électroménager, mobilier, décoration</p>
+                    </div>
+                    <div class="category-card">
+                        <div class="category-icon">🚗</div>
+                        <h3>Transport</h3>
+                        <p>Vélos, trottinettes, accessoires auto</p>
+                    </div>
+                </div>
+
+                <h2 style="margin-bottom: 30px; text-align: center;">Objets recommandés</h2>
+                <div class="popular-items">
+                    <div class="item-card">
+                        <div class="item-image">📷</div>
+                        <div class="item-details">
+                            <div class="item-title">Appareil photo Canon EOS</div>
+                            <div class="item-price">25€/jour</div>
+                            <div class="item-location">📍 Paris 15ème</div>
+                        </div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-image">🔧</div>
+                        <div class="item-details">
+                            <div class="item-title">Perceuse Bosch Professional</div>
+                            <div class="item-price">15€/jour</div>
+                            <div class="item-location">📍 Lyon 3ème</div>
+                        </div>
+                    </div>
+                    <div class="item-card">
+                        <div class="item-image">🎮</div>
+                        <div class="item-details">
+                            <div class="item-title">Console PlayStation 5</div>
+                            <div class="item-price">30€/jour</div>
+                            <div class="item-location">📍 Marseille 6ème</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fiche d'objet -->
+            <div id="object-details" class="page">
+                <div class="object-details">
+                    <div class="object-gallery">
+                        📷 Galerie photo
+                    </div>
+                    <div class="object-info">
+                        <h1 class="object-title">Appareil photo Canon EOS R5</h1>
+                        <div class="object-price">25€/jour</div>
+                        <div class="object-description">
+                            Appareil photo professionnel en parfait état. Idéal pour vos projets photo et vidéo. 
+                            Livré avec objectif 24-70mm, batterie supplémentaire et carte mémoire 64GB.
+                        </div>
+                        <div class="object-meta">
+                            <div class="meta-item">
+                                <div class="meta-label">Localisation</div>
+                                <div class="meta-value">📍 Paris 15ème</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Disponibilité</div>
+                                <div class="meta-value">✅ Disponible</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-label">Catégorie</div>
+                                <div class="meta-value">📱 Électronique</div>
+                            </div>
+                        </div>
+                        <div class="reserve-section">
+                            <h3>Réserver cet objet</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Date de début</label>
+                                    <input type="date">
+                                </div>
+                                <div class="form-group">
+                                    <label>Date de fin</label>
+                                    <input type="date">
+                                </div>
+                            </div>
+                            <button class="btn btn-primary" style="margin-top: 15px; width: 100%;">
+                                Réserver maintenant
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3>Profil du propriétaire</h3>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-top: 15px;">
+                        <div style="width: 60px; height: 60px; background: #4facfe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                            👤
+                        </div>
+                        <div>
+                            <div style="font-weight: bold;">Marie Dubois</div>
+                            <div style="color: #666;">Membre depuis 2023</div>
+                            <div style="color: #4facfe;">⭐⭐⭐⭐⭐ (4.8/5)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h3>Avis et commentaires</h3>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 15px;">
+                        <div style="font-weight: bold; margin-bottom: 10px;">Jean Martin</div>
+                        <div style="color: #4facfe; margin-bottom: 10px;">⭐⭐⭐⭐⭐</div>
+                        <div>Excellent appareil photo ! Très bien entretenu et le propriétaire est très arrangeant.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dépôt d'objet -->
+            <div id="listing" class="page">
+                <div class="listing-form">
+                    <h2 style="margin-bottom: 30px;">Proposer un objet à la location</h2>
+                    
+                    <div class="form-section">
+                        <h3>📸 Photos de l'objet</h3>
+                        <div class="photo-upload">
+                            <div class="photo-upload-icon">📷</div>
+                            <div>Cliquez pour ajouter des photos</div>
+                            <div style="font-size: 0.9rem; color: #666; margin-top: 5px;">
+                                Formats acceptés: JPG, PNG (max 5MB)
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📝 Informations générales</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Titre de l'annonce</label>
+                                <input type="text" placeholder="Ex: Appareil photo Canon EOS R5">
+                            </div>
+                            <div class="form-group">
+                                <label>Catégorie</label>
+                                <select>
+                                    <option>Sélectionner une catégorie</option>
+                                    <option>Appareils numériques</option>
+                                    <option>Outillage</option>
+                                    <option>Maison & Jardin</option>
+                                    <option>Transport</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Prix par jour (€)</label>
+                                <input type="number" placeholder="25">
+                            </div>
+                            <div class="form-group">
+                                <label>Durée minimale (jours)</label>
+                                <input type="number" value="1" min="1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Description complète</label>
+                            <textarea placeholder="Décrivez votre objet en détail..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📍 Localisation et disponibilité</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Ville</label>
+                                <input type="text" placeholder="Paris">
+                            </div>
+                            <div class="form-group">
+                                <label>Code postal</label>
+                                <input type="text" placeholder="75015">
+                            </div>
+                            <div class="form-group">
+                                <label>Disponible à partir du</label>
+                                <input type="date">
+                            </div>
+                            <div class="form-group">
+                                <label>Disponible jusqu'au</label>
+                                <input type="date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 30px;">
+                        <button class="btn btn-primary" style="padding: 15px 40px; font-size: 1.1rem;">
+                            Publier l'annonce
+                        </button>
+                        <button class="btn btn-secondary" style="padding: 15px 40px; font-size: 1.1rem; margin-left: 15px;">
+                            Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messagerie -->
+            <div id="chat" class="page">
+                <h2 style="margin-bottom: 30px;">💬 Messagerie intégrée</h2>
+                <div class="chat-container">
+                    <div class="chat-sidebar">
+                        <h3 style="margin-bottom: 15px;">Conversations</h3>
+                        <div class="chat-list">
+                            <div class="chat-item active">
+                                <div style="font-weight: bold;">Marie Dubois</div>
+                                <div style="font-size: 0.9rem; color: #666;">Appareil photo Canon...</div>
+                                <!-- Ajoute juste en bas de ton code HTML là où ça s'était arrêté -->
+<!-- Reprise de la messagerie, suite du chat-main -->
+
+                            </div> <!-- .chat-list -->
+                        </div> <!-- .chat-sidebar -->
+
+                        <div class="chat-main">
+                            <div class="chat-header">Marie Dubois</div>
+                            <div class="chat-messages">
+                                <div class="message received">Bonjour, est-ce que l'appareil est toujours disponible ?</div>
+                                <div class="message sent">Oui, il est disponible toute cette semaine 🙂</div>
+                                <div class="message received">Parfait ! Je le réserverai pour jeudi alors.</div>
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" placeholder="Écrire un message...">
+                                <button>Envoyer</button>
+                            </div>
+                        </div>
+                    </div> <!-- .chat-container -->
+                </div> <!-- #chat -->
+
+                <!-- Tableau de bord -->
+                <div id="dashboard" class="page">
+                    <h2 style="margin-bottom: 30px;">📊 Tableau de bord</h2>
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <h3>Mes objets en location</h3>
+                            <div class="rental-status">
+                                <div>Canon EOS R5</div>
+                                <div class="status-badge status-active">En cours</div>
+                            </div>
+                            <div class="rental-status">
+                                <div>Perceuse Bosch</div>
+                                <div class="status-badge status-completed">Terminé</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Mes locations</h3>
+                            <div class="rental-status">
+                                <div>Trottinette électrique</div>
+                                <div class="status-badge status-pending">En attente</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-card">
+                            <h3>Notifications</h3>
+                            <div class="notification">
+                                Nouvelle demande de location pour "Canon EOS R5".
+                            </div>
+                            <div class="notification">
+                                Message reçu de Jean Martin.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Composants (optionnel) -->
+                <div id="components" class="page">
+                    <h2>🧩 Bibliothèque de composants (demo UI)</h2>
+                    <p>Cette section peut être utilisée pour tester des boutons, des cartes ou autres éléments.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="#" class="btn btn-primary">Bouton primaire</a>
+                        <a href="#" class="btn btn-secondary">Bouton secondaire</a>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>À propos</h4>
+                        <ul>
+                            <li><a href="#">Notre mission</a></li>
+                            <li><a href="#">Équipe</a></li>
+                            <li><a href="#">Presse</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Aide</h4>
+                        <ul>
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Conditions d'utilisation</a></li>
+                            <li><a href="#">Politique de confidentialité</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Contact</h4>
+                        <ul>
+                            <li><a href="#">support@loopit.com</a></li>
+                            <li><a href="#">+33 1 23 45 67 89</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    &copy; 2025 Loopit - Tous droits réservés
+                </div>
+            </footer>
+        </div> <!-- .container -->
+
+        <!-- JS pour la navigation entre les pages -->
+        <script>
+            function showPage(id) {
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.page-tab').forEach(tab => tab.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                Array.from(document.querySelectorAll('.page-tab')).find(tab => tab.textContent.includes(id.split('-')[0])).classList.add('active');
+            }
+        </script>
+    </body>
+</html>
